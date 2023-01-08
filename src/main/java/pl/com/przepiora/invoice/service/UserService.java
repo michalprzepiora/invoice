@@ -1,5 +1,6 @@
 package pl.com.przepiora.invoice.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -14,14 +15,16 @@ import java.util.HashSet;
 @Service
 public class UserService {
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User addNewUser(NewUserDTO newUserDTO) {
         User user = User.builder().email(newUserDTO.getEmail())
-                .password(newUserDTO.getPassword1())
+                .password(passwordEncoder.encode(newUserDTO.getPassword1()))
                 .roles(new HashSet<>(Collections.singleton(Role.USER)))
                 .accountExpired(false)
                 .accountLocked(false)
