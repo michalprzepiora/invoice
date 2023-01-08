@@ -10,7 +10,6 @@ import pl.com.przepiora.invoice.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -33,17 +32,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> getUser(String email){
-        return userRepository.findByEmailIgnoreCase(email);
-    }
-
-    public Errors validate(NewUserDTO newUserDTO) {
+    public Errors validateRetypingPassword(NewUserDTO newUserDTO) {
         Errors errors = new BeanPropertyBindingResult(newUserDTO,"newUserDTO");
         if (!(newUserDTO.getPassword1().equals(newUserDTO.getPassword2()))) {
             errors.reject("400", "Both passwords must be the same.");
-        }
-        if(getUser(newUserDTO.getEmail()).isPresent()){
-            errors.reject("400", "This email is already in use.");
         }
         return errors;
     }

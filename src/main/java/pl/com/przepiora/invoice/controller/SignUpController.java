@@ -34,7 +34,7 @@ public class SignUpController {
 
     @PostMapping("/signup")
     public ModelAndView saveUser(ModelAndView modelAndView, @Valid @ModelAttribute NewUserDTO newUserDTO, Errors errors) {
-        errors.addAllErrors(userService.validate(newUserDTO));
+        errors.addAllErrors(userService.validateRetypingPassword(newUserDTO));
         if (errors.hasErrors()) {
             modelAndView.addObject("errorMessages", getErrorMessages(errors));
             modelAndView.setStatus(HttpStatusCode.valueOf(400));
@@ -42,14 +42,14 @@ public class SignUpController {
         } else {
             userService.addNewUser(newUserDTO);
             modelAndView.setStatus(HttpStatusCode.valueOf(201));
-            modelAndView.setViewName("signup");
+            modelAndView.setViewName("redirect:login");
         }
         return modelAndView;
     }
 
     private List<String> getErrorMessages(Errors errors) {
         if (errors.hasErrors()) {
-            return errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
+            return errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
         }
         return Collections.emptyList();
     }
