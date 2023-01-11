@@ -25,6 +25,7 @@ public class User implements UserDetails {
     private boolean accountLocked;
     private boolean credentialsExpired;
     private boolean enabled;
+    private String token;
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -1,7 +1,5 @@
 package pl.com.przepiora.invoice.configuration;
 
-import jakarta.servlet.annotation.WebServlet;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,6 +41,7 @@ public class SecurityConfiguration {
                 authorizeHttpRequests()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/signup").permitAll()
+                .requestMatchers("/confirm_mail").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .requestMatchers("/all/**").permitAll()
                 .anyRequest().authenticated()
