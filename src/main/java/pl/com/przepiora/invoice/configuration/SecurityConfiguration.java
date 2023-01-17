@@ -1,38 +1,34 @@
 package pl.com.przepiora.invoice.configuration;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import pl.com.przepiora.invoice.security.JpaAuthenticationProvider;
 
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan("pl.com.przepiora.invoice.security")
 public class SecurityConfiguration {
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity, JpaAuthenticationProvider jpaAuthenticationProvider) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
+            authenticationManagerBuilder.authenticationProvider(jpaAuthenticationProvider);
+            return authenticationManagerBuilder.build();
+    }
 
     @Bean
     public PasswordEncoder getBcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("aaa")
-                .password(getBcryptPasswordEncoder().encode("aaa"))
-                .roles("ADMIN")
-                .build();
-        UserDetails admin = User.withUsername("bbb")
-                .password(getBcryptPasswordEncoder().encode("bbb"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user, admin);
     }
 
     @Bean
@@ -42,6 +38,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/signup").permitAll()
                 .requestMatchers("/confirm_mail").permitAll()
+                .requestMatchers("/login").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .requestMatchers("/all/**").permitAll()
                 .anyRequest().authenticated()
@@ -54,7 +51,6 @@ public class SecurityConfiguration {
                 .and()
                 .formLogin().and()
                 .csrf().disable();
-
 
 
         return httpSecurity.build();
